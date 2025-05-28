@@ -43,6 +43,10 @@ A simple and clean voting app built with **React Native (Expo)**. Users can crea
 5. Start the Expo server:
    npx expo start
 
+## 📸 Screenshots
+![Simulator Screenshot - iPhone 16 Plus - 2025-05-09 at 14 59 13](https://github.com/user-attachments/assets/0e477657-a919-466b-91f6-6f42eb6208d4)
+
+
 
    
 
