@@ -1,20 +1,101 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, View, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
+import { enableScreens } from 'react-native-screens';
+enableScreens();
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import LoginScreen from './components/LoginScreen';
+import RegisterScreen from './components/RegisterScreen';
+import WelcomeBackScreen from './components/WelcomeBackScreen';
+import VotingScreen from './components/VotingScreen';
+import OngoingPollsScreen from './components/OngoingPollsScreen';
+import LiveResultScreen from './components/LiveResultScreen';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const loggedIn = await AsyncStorage.getItem('isLoggedIn');
+        setIsLoggedIn(loggedIn === 'true');
+      } catch (error) {
+        console.error('Error checking login status:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkLoginStatus();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex:1, justifyContent:'center', alignItems:'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName={isLoggedIn ? 'OngoingPolls' : 'Login'}>
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="Register" 
+          component={RegisterScreen} 
+          options={{ headerShown: true }} 
+        />
+        <Stack.Screen 
+          name="WelcomeBack" 
+          component={WelcomeBackScreen} 
+          options={{ headerShown: true }} 
+        />
+        <Stack.Screen 
+          name="OngoingPolls" 
+          component={OngoingPollsScreen} 
+          options={{ 
+            headerShown: true, 
+            headerTitle: 'Ongoing Polls',
+            headerBackVisible: false
+          }} 
+        />
+        <Stack.Screen 
+          name="Vote" 
+          component={VotingScreen} 
+          options={{
+            headerShown: true,
+            headerTitle: 'Cast Your Vote',
+            headerBackTitle: 'Back',
+          }}
+        />
+        <Stack.Screen 
+          name="LiveResults" 
+          component={LiveResultScreen} 
+          options={({ navigation }) => ({
+            headerShown: true,
+            headerTitle: 'Live Results',
+            headerBackVisible: false,
+            headerRight: () => (
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('OngoingPolls')}
+                style={{ marginRight: 15 }}
+              >
+                <Ionicons name="close" size={24} color="black" />
+              </TouchableOpacity>
+            ),
+          })}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
