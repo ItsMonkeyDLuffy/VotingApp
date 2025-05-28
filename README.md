@@ -1,6 +1,6 @@
 # 📱 React Native Voting App
 
-A simple and clean voting app built with **React Native (Expo)**. Users can create polls, vote, and view live results. The app also includes phone number-based login and ensures users can’t vote multiple times on the same poll.
+A simple and clean voting app built with **React Native (Expo)**. Users can create polls, vote, and view live results. The app also includes phone number-based login and ensures users can’t vote multiple times on the same poll. The OTP verification system is a dummy one with otp set to 123456.
 
 ---
 
@@ -44,7 +44,16 @@ A simple and clean voting app built with **React Native (Expo)**. Users can crea
    npx expo start
 
 ## 📸 Screenshots
-![Simulator Screenshot - iPhone 16 Plus - 2025-05-09 at 14 59 13](https://github.com/user-attachments/assets/0e477657-a919-466b-91f6-6f42eb6208d4)
+<p float="left">
+
+  <img src="https://github.com/user-attachments/assets/0e113b05-f4d4-4f57-b1e3-751fd8efa3c1" alt="Login Screen" width="250" />
+  <img src="https://github.com/user-attachments/assets/deb11ec5-f525-4126-97f0-f788b98517d2" alt="New Voter Screen" width="250" />
+  <img src="https://github.com/user-attachments/assets/ea47de4d-ea39-462d-8a97-840d7a228e97" alt="Ongoing Polls Screen" width="250" />
+  <img src="https://github.com/user-attachments/assets/5c12eded-3fb9-46af-abfb-8bc53d44dd83" alt="New Poll" width="250" />
+  <img src="https://github.com/user-attachments/assets/561980d4-da04-4261-a101-a0144d246c68" alt="Cast your Vote Screen" width="250" />
+  <img src="https://github.com/user-attachments/assets/58d0419a-4eff-4379-b831-eaa0da6cd0d5" alt="Result Screen" width="250" />
+
+</p>
 
 
 
