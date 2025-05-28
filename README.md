@@ -35,13 +35,16 @@ A simple and clean voting app built with **React Native (Expo)**. Users can crea
    git clone https://github.com/yourusername/VotingApp.git
 
 2. Navigate into the project directory:
-   cd VotingApp
+      ```bash
+      cd VotingApp
 
-3. Install dependencies:
-   npm install
+4. Install dependencies:
+      ```bash
+      npm install
    
-5. Start the Expo server:
-   npx expo start
+6. Start the Expo server:
+      ```bash
+       npx expo start
 
 ## 📸 Screenshots
 <p float="left">
