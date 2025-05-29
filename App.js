@@ -17,24 +17,27 @@ import LiveResultScreen from './components/LiveResultScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [initialRoute, setInitialRoute] = useState(null);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const loggedIn = await AsyncStorage.getItem('isLoggedIn');
-        setIsLoggedIn(loggedIn === 'true');
+        const phoneNumber = await AsyncStorage.getItem('USER_PHONE_NUMBER');
+        if (phoneNumber) {
+          setInitialRoute('OngoingPolls');
+        } else {
+          setInitialRoute('Login');
+        }
       } catch (error) {
         console.error('Error checking login status:', error);
-      } finally {
-        setIsLoading(false);
+        setInitialRoute('Login');
       }
     };
+
     checkLoginStatus();
   }, []);
 
-  if (isLoading) {
+  if (!initialRoute) {
     return (
       <View style={{ flex:1, justifyContent:'center', alignItems:'center' }}>
         <ActivityIndicator size="large" />
@@ -44,7 +47,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={isLoggedIn ? 'OngoingPolls' : 'Login'}>
+      <Stack.Navigator initialRouteName={initialRoute}>
         <Stack.Screen 
           name="Login" 
           component={LoginScreen} 

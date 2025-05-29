@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProgressBar } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { useLayoutEffect } from 'react';
-
 
 export default function LiveResultScreen({ route, navigation }) {
   const { poll: initialPoll } = route.params || {};
-  const [poll, setPoll] = useState(initialPoll || { title: 'Poll Results', options: [], endTime: Date.now() });
+  const [poll, setPoll] = useState(initialPoll || null);
   const [votes, setVotes] = useState([]);
   const [isPollClosed, setIsPollClosed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,17 +26,17 @@ export default function LiveResultScreen({ route, navigation }) {
   }, [navigation]);
 
   useLayoutEffect(() => {
-  navigation.setOptions({
-    headerShown: true,
-    headerTitle: '',
-    headerBackVisible: false,
-    headerRight: () => (
-      <TouchableOpacity onPress={handleManualClose} style={{ marginRight: 15 }}>
-        <Ionicons name="close" size={24} color="black" />
-      </TouchableOpacity>
-    ),
-  });
-}, [navigation, handleManualClose]);
+    navigation.setOptions({
+      headerShown: true,
+      headerTitle: '',
+      headerBackVisible: false,
+      headerRight: () => (
+        <TouchableOpacity onPress={handleManualClose} style={{ marginRight: 15 }}>
+          <Ionicons name="close" size={24} color="black" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, handleManualClose]);
 
   const formatTimeRemaining = useCallback(() => {
     if (isPollClosed || !poll?.endTime) return 'Poll Closed';
@@ -48,12 +46,12 @@ export default function LiveResultScreen({ route, navigation }) {
     const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
     return `${hours}h ${minutes}m ${seconds}s remaining`;
-  }, [isPollClosed, poll?.endTime]);
+  }, [isPollClosed, poll]);
 
   const checkPollStatus = useCallback(() => {
     const currentTime = Date.now();
     setIsPollClosed(currentTime >= (poll?.endTime || 0));
-  }, [poll?.endTime]);
+  }, [poll]);
 
   const calculateLeadingOption = useCallback((currentVotes) => {
     if (!currentVotes.length) return 'No votes yet';
@@ -61,7 +59,7 @@ export default function LiveResultScreen({ route, navigation }) {
     if (totalVotes === 0) return 'No votes yet';
     const leadingIndex = currentVotes.indexOf(Math.max(...currentVotes));
     return poll?.options?.[leadingIndex]?.text || 'No votes yet';
-  }, [poll?.options]);
+  }, [poll]);
 
   const fetchVotes = useCallback(async () => {
     try {
@@ -82,11 +80,20 @@ export default function LiveResultScreen({ route, navigation }) {
     }
   }, [calculateLeadingOption]);
 
+  // 🔥 KEY FIX: safely handle missing poll/options without causing React warnings
   useEffect(() => {
-    if (!poll || !poll.options) {
-      navigation.navigate('OngoingPolls');
-      return;
+    if (initialPoll && initialPoll.options && initialPoll.options.length > 0) {
+      setPoll(initialPoll);
+    } else {
+      const timeout = setTimeout(() => {
+        navigation.navigate('OngoingPolls');
+      }, 0);
+      return () => clearTimeout(timeout);
     }
+  }, [initialPoll, navigation]);
+
+  useEffect(() => {
+    if (!poll) return;
 
     checkPollStatus();
     fetchVotes();
@@ -115,7 +122,7 @@ export default function LiveResultScreen({ route, navigation }) {
       clearInterval(countdownIntervalRef.current);
       clearInterval(voteIntervalRef.current);
     };
-  }, [navigation, isPollClosed, fetchVotes, checkPollStatus]);
+  }, [poll, isPollClosed, fetchVotes, checkPollStatus, navigation]);
 
   const renderOption = useCallback(({ item, index }) => {
     const voteCount = votes[index] || 0;
